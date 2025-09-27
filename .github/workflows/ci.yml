@@ -58,3 +58,13 @@ jobs:
         name: playwright-report
         path: apps/web/playwright-report/
         retention-days: 30
+        
+    - name: Run Backend Unit Tests
+      run: cd backend && npm run test:unit
+
+    - name: Run Backend E2E Tests
+      run: cd backend && npm run test:e2e
+
+    - name: Run Frontend E2E Tests
+      run: cd frontend && npm run test:e2e
+

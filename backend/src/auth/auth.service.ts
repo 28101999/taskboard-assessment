@@ -14,30 +14,23 @@ export class AuthService {
 
   async register(registerDto: RegisterDto) {
     const { email, password } = registerDto;
-    
-    // Check if user already exists
+
     const existingUser = await this.usersService.findByEmail(email);
     if (existingUser) {
       throw new ConflictException('User with this email already exists');
     }
 
-    // Hash password
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // Create user
-    const user = await this.usersService.create({
-      email,
-      passwordHash,
-    });
+    const user = await this.usersService.create({ email, passwordHash });
 
-    // Remove password from response
     const { passwordHash: _, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
 
   async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
-    
+
     const user = await this.usersService.findByEmail(email);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -61,7 +54,8 @@ export class AuthService {
     };
   }
 
-  async validateUser(payload: any) {
-    return await this.usersService.findById(payload.sub);
+  // ✅ Only accepts payload object (used by Passport JWT strategy)
+  async validateUser(payload: { sub: string; email: string }) {
+    return this.usersService.findById(payload.sub);
   }
 }
